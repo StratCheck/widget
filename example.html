@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Widget test page</title>
+    <script type="text/javascript" async src="/bower_components/d3/d3.js"></script>
+      <script type="text/javascript" async src="/bower_components/moment/moment.js"></script>
+    <script type="text/javascript" async src="/src/data.js"></script>
+  </head>
+  <body>
+    <widget id="test-widget"></widget>
+    <script type="text/javascript">
+    var _scw = _scw || {};
+    _scw.id = '#test-widget';
+
+    (function() {
+      var scw = document.createElement('script'); scw.type = 'text/javascript'; scw.async = true;
+      scw.src = '//localhost:9000/src/strat-check-interactive-widget.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(scw, s);
+    })();
+
+  </script>
+  </body>
+</html>

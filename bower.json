@@ -1,0 +1,25 @@
+{
+  "name": "strat-check-interactive-widget",
+  "version": "0.0.0",
+  "homepage": "https://github.com/StratCheck/widget",
+  "authors": [
+    "Semeyon Svetliy <semeyon@gmail.com>"
+  ],
+  "description": "Portfolio widget async binded to the html",
+  "main": "scwidget.js",
+  "moduleType": [
+    "amd"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "d3": "~3.5.5",
+    "moment": "~2.10.2"
+  }
+}
