@@ -1,3 +1,15 @@
+svg{
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.428571429;
+  background-color: #fff;
+  color: #333;
+}
+
+.x.brush{
+  opacity: 0;
+}
+ 
 .axis path,
 .axis line {
   fill: none;
@@ -38,35 +50,35 @@ g.custom_tick line {
   stroke: #ccc;
 }
 
-master-graph path.line {
+path.line {
   opacity: .2;
 }
 
-master-graph path.line:hover {
+path.line:hover {
   opacity: 0.8;
 }
 
-master-graph path.line.active {
+path.line.active {
   opacity: 1;
 }
 
-master-graph .brush .background {
+.brush .background {
   fill: black;
   opacity: .1;
   visibility: visible;
 }
 
-master-graph .brush .extent {
+.brush .extent {
   fill: white;
   opacity: 1;
   fill-opacity: 1;
 }
 
-master-graph .bold.tick line {
+.bold.tick line {
   stroke-dasharray: 5,5;
 }
 
-master-graph .border-rect {
+.border-rect {
   fill: none;
   stroke: #ccc;
   stroke-width: 1;
