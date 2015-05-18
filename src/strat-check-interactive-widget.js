@@ -11,30 +11,20 @@
   //load: styles
   //Init widget there
   
-  var chartStyles = 'svg{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-size:14px;line-height:1.428571429;background-color:#fff;color:#333}.x.brush{opacity:0}.axis line,.axis path{fill:none;stroke:#000;shape-rendering:crispEdges}.x.axis path{display:none}.line{fill:none;stroke:#4682b4;stroke-width:1.5px}.arc path{stroke:#fff}circle{stroke-opacity:.2}.brush .extent{stroke:#fff;shape-rendering:crispEdges}.brush .resize{fill:url(/images/arrowUp.jpg)}g.custom_tick line,g.tick line{stroke:#ccc}path.line{opacity:.2}path.line:hover{opacity:.8}path.line.active{opacity:1}.brush .background{fill:#000;opacity:.1;visibility:visible}.brush .extent{fill:#fff;opacity:1;fill-opacity:1}.bold.tick line{stroke-dasharray:5,5}.border-rect{fill:none;stroke:#ccc;stroke-width:1}.line.Moderate-Aggressive{stroke:#2c363a}.line.Conservative{stroke:#2ab4c0}.line.Income{stroke:#dec458}.line.best-fitting-bmark{stroke:#B8AE51}.line.Aggressive{stroke:#157991}.line.Moderate{stroke:#d64434}.line.global-dynamic-strategy{stroke:#A5A581}.Moderate-Aggressive{color:#2c363a;border-color:#2c363a}.Conservative{color:#2ab4c0;border-color:#2ab4c0}.Income{color:#dec458;border-color:#dec458;border-width:inherit}.best-fitting-bmark{color:#B8AE51;border-color:#B8AE51;border-width:inherit}.Aggressive{color:#157991;border-color:#157991;border-width:inherit}.Moderate{color:#d64434;border-color:#d64434;border-width:inherit}.global-dynamic-strategy{color:#A5A581;border-color:#A5A581;border-width:inherit}.benchmark-select{margin-left:50px;margin-bottom:20px}.custom_tick,.tick{fill:#999}annualized-bar .custom_tick,annualized-bar .tick{stroke-dasharray:26,25}annualized-bar .custom_tick.bold line,annualized-bar .tick.bold line{stroke:#000}annualized-bar text.value{fill:#e9e9e9}annualized-bar text.name{font-size:14px;fill:#333}annualized-bar .axis_line{stroke:#ccc;stroke-width:1}slave-graph text{fill:#e9e9e9}slave-graph .arc text{text-anchor:middle;font-size:18px}slave-graph .arc line{stroke:#ddd;stroke-width:1;stroke-dasharray:2,4;stroke-opacity:.5}slave-graph .lines-text{fill:#999}slave-graph .lines{stroke:#ccc;stroke-width:1}.chart-stage h3{padding-top:20px;margin-top:0;font-size:16px;color:#333}.control_buttons a,.control_buttons button{color:#00b3e4}.top_buttons{padding-top:7px;padding-bottom:23px}bs-dropdown .dropdown{display:inline}.benchmark-select label{margin-right:5px}.benchmark-select a,.benchmark-select a:focus,.benchmark-select a:hover{text-decoration:none}.benchmark-select .dropdown-menu{padding-top:0;cursor:pointer;border:none;box-shadow:1px 1px 6px 1px rgba(0,0,0,.2);margin-top:10px}.benchmark-select .dropdown-menu a:focus,.benchmark-select .dropdown-menu li:focus{outline:0}.benchmark-select .dropdown-menu i{margin-right:10px}.benchmark-select .dropdown-menu:before{content:" ";background-image:url(/images/arrow.png);background-size:100% 100%;height:8px;width:24px;position:absolute;right:30px;top:-8px}';
+  var chartStyles = __sc_cs;
   
   var utils = {
-    get_width : function (el) {
-      el = d3.select(el);
-      return parseInt(el.style('width'), 10) - parseInt(el.style('padding-left'), 10) - parseInt(el.style('padding-right'), 10);
-    },
-    get_height : function (el) {
-      el = d3.select(el);
-      return parseInt(el.style('height'), 10) - parseInt(el.style('padding-top'), 10) - parseInt(el.style('padding-bottom'), 10);
-    },
     isFunction : function(obj) {
       return typeof obj == 'function' || false;
     }
   };
   
-  window.utils = utils;
-  
   var timeSeriesChart = function(type) {
 
     var margin    = {top: 0, right: 20, bottom: 20, left: 50},
         svgMargin = {top: 46, right: 0, bottom: 0, left: 0},
-        svgWidth  = 1000,
-        svgHeight = 500,
+        svgWidth  = 840,
+        svgHeight = 480,
         width  = svgWidth,
         height = svgHeight,
         chart_type = type,
@@ -66,15 +56,9 @@
     function chart(selection) {
       selection.each(function(data) {
         console.log(this);
-        //svgWidth  = utils.get_width(this.parentNode.parentNode) - svgMargin.left - svgMargin.right;
-        //svgHeight = utils.get_height(this.parentNode.parentNode) - svgMargin.top - svgMargin.bottom;
-        //width     = svgWidth - margin.left - margin.right;
-        //height    = svgHeight - margin.bottom;
-        
-        //TODO:Fix that!
-        width  = svgWidth; 
-        height = svgHeight;
-        
+
+        width     = svgWidth - margin.left - margin.right;
+        height    = svgHeight - margin.bottom;
         
         var xDomain = [undefined, undefined],
             yDomain = [undefined, undefined];
@@ -252,22 +236,12 @@
     return chart;
   };
 
-  
-
   var host     = document.querySelector(_scw.id);
   var root     = host.createShadowRoot();
   var styleElm = document.createElement('style');
   styleElm.innerHTML = chartStyles;
   root.appendChild(styleElm);
-  //root.textContent = 'The shadow DOM';
 
-  //TODO: Refactore it ro inline style tag!
-  var style = document.createElement("link");
-  style.rel = "stylesheet";
-  style.href = "/src/charts.css";
-  document.querySelector('head').appendChild(style);
-  //----------------------------------------------//
- 
   //console.log(root);
   //console.log(d3.select(host));
   
@@ -285,7 +259,7 @@
         
         var range = {begin: "2010-12-09 10:26:14", end: "2014-12-24 06:00:00"};
         var begin = moment(extent[0]).format(date_format);
-        var end = moment(extent[1]).format(date_format);
+        var end   = moment(extent[1]).format(date_format);
         
       }, thTimeout));
    
@@ -327,4 +301,4 @@
     
    redrawChart(_scw_data);
 
-})(window, _scw, _scw_data);
+})(window, _scw, _scw_data, __sc_cs);
