@@ -1,3 +1,5 @@
+/* global __sc_tmpl */
+/* global __sc_cs */
 /* global _scw_data */
 /* global Exception */
 /* global _ */
@@ -7,11 +9,11 @@
 (function() {
   "use strict";
   
-  //create shadow dom
-  //load: styles
-  //Init widget there
-  
-  var chartStyles = __sc_cs;
+  var widgetStyles = __sc_cs,
+      widgetTmpl   = __sc_tmpl,
+      chartTypes   = ['relative_price', 'absolute'],
+      types   	   = [],
+      chosedType   = {label: '(none)', value: undefined};
   
   var utils = {
     isFunction : function(obj) {
@@ -22,7 +24,6 @@
   var timeSeriesChart = function(type) {
 
     var margin    = {top: 0, right: 20, bottom: 20, left: 50},
-        svgMargin = {top: 46, right: 0, bottom: 0, left: 0},
         svgWidth  = 840,
         svgHeight = 480,
         width  = svgWidth,
@@ -35,7 +36,7 @@
         xAxis  = d3.svg.axis().scale(xScale).orient("bottom").ticks(6),
         yAxis  = d3.svg.axis().scale(yScale).orient("left").ticks(6).tickFormat(function(d){
           if (chart_type == 'relative'){
-            return parseInt(parseInt(d) * 100) + "%";
+            return Number(Number(d) * 100) + "%";
           } else {
             return "$" + d.toFixed(2);
           }
@@ -124,9 +125,8 @@
           .attr("height", height)
           .style('visibility', 'visible');
 
+        gEnter.append('g').attr('class', 'paths');
         
-
-        var paths = gEnter.append('g').attr('class', 'paths');
         _.each(data, function(value, key){
           gEnter.select('.paths').append("path").attr("class", "line " + key.replace(' ', '-')).attr('d', line(value));
         });
@@ -184,16 +184,6 @@
       }
     };
 
-    // The x-accessor for the path generator; xScale ∘ xValue.
-    function X(d) {
-      return xScale(xValue(d));
-    }
-
-    // The x-accessor for the path generator; yScale ∘ yValue.
-    function Y(d) {
-      return yScale(yValue(d));
-    }
-
     chart.margin = function(_) {
       if (!arguments.length) return margin;
       margin = _;
@@ -236,32 +226,23 @@
     return chart;
   };
 
-  var host     = document.querySelector(_scw.id);
-  var root     = host.createShadowRoot();
-  var styleElm = document.createElement('style');
-  styleElm.innerHTML = chartStyles;
-  root.appendChild(styleElm);
-
-  //console.log(root);
-  //console.log(d3.select(host));
+  var host     = document.querySelector(_scw.id),
+      root     = host.createShadowRoot(),
+      styleElm = document.createElement('style'),
+      tmplElm  = document.createElement('div');
+      
+  window.root = root;
   
-  var chartTypes  = ['relative_price', 'absolute'];
-  var date_format = 'YYYY-MM-DD hh:mm:ss';
-  var thTimeout   = 1000;
-  var types   	  = [];
-  var chosedType  = {label: '(none)', value: undefined};
-    
+  styleElm.innerHTML = widgetStyles;
+  tmplElm.innerHTML  = widgetTmpl;
+  root.appendChild(styleElm);
+  root.appendChild(tmplElm);
+  
+  var mainGraph = root.querySelector('.mg');
   
   var chart = timeSeriesChart(chartTypes[0])
       .x(function(o){ return o.x; })
-      .y(function(o){ return o.y; })
-      .brushCallback(_.throttle(function(extent) {
-        
-        var range = {begin: "2010-12-09 10:26:14", end: "2014-12-24 06:00:00"};
-        var begin = moment(extent[0]).format(date_format);
-        var end   = moment(extent[1]).format(date_format);
-        
-      }, thTimeout));
+      .y(function(o){ return o.y; });
    
    var redrawChart = function(newData) {
       if (_.isObject(newData)) {
@@ -293,7 +274,7 @@
           }
         };
 
-        d3.select(root)
+        d3.select(mainGraph)
           .datum(results)
           .call(chart);
       }
@@ -301,4 +282,4 @@
     
    redrawChart(_scw_data);
 
-})(window, _scw, _scw_data, __sc_cs);
+})(window, _scw, _scw_data, __sc_cs, __sc_tmpl);
