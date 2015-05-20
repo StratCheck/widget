@@ -42,6 +42,10 @@
           .attr("class", "labels");
         gEnter.append("g")
           .attr("class", "lines");
+        gEnter.append("g")
+          .attr("class", "outer-arc")
+          .append('circle')
+          .attr('cx', 0).attr('cy', 0).attr('r', radius*0.8);
   
         var pie = d3.layout.pie()
           .sort(null)
@@ -66,8 +70,8 @@
         var key = function(d){ return d.data.label; };
 
         var color = d3.scale.ordinal()
-          .domain(["Lorem ipsum", "dolor sit", "amet", "consectetur", "adipisicing", "elit", "sed", "do", "eiusmod", "tempor", "incididunt"])
-          .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+          .domain(["Lorem ipsum", "dolor sit", "amet", "consectetur", "adipisicing"])
+          .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56"]);
           
         function randomData (){
           var labels = color.domain();
