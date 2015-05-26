@@ -72,10 +72,10 @@ module.exports = function(grunt) {
       
       var fs      = require('fs'),
           minify  = require('html-minifier').minify,
-          opts     = grunt.config.get('convert_template'),
+          opts    = grunt.config.get('convert_template'),
           fileSrc = opts.src  ? opts.src  : 'src/template.html',
           fileOut = opts.dest ? opts.dest : 'src/tmpl.js',
-          tmpl    = "'use strict';window.__sc_tmpl ='{{body}}';";
+          tmpl    = "'use strict';window.__sc_tmpl ='{{template}}';";
       
       fs.readFile(fileSrc, {encoding: "utf-8"}, function(err, data){
 
@@ -85,7 +85,7 @@ module.exports = function(grunt) {
         grunt.log.writeln('Minify html data.');
 
         var minifiedData = minify(data, {collapseWhitespace: true});
-        var outData = tmpl.replace('{{body}}', minifiedData);
+        var outData = tmpl.replace('{{template}}', minifiedData);
         
         fs.writeFile(fileOut, outData, function (err) {
           if (err) throw err;

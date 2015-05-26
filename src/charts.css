@@ -1,7 +1,25 @@
+body{
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #A4A4A4;
+}
+
 .lc, .rc{
   float:left;
   text-align: center;
   padding: 15px;
+}
+
+.row{
+  clear: both;
+}
+
+h2{
+  color: #333333;
+  text-transform: uppercase;
+  font-size: 16px;
+}
+small{
+  text-transform: uppercase;
 }
 
 svg{
@@ -10,6 +28,12 @@ svg{
   line-height: 1.428571429;
   background-color: #fff;
   color: #333;
+}
+
+.acw{}
+
+.acw text{
+  fill: #787878;
 }
 
 path.slice{
