@@ -24,21 +24,39 @@
       ],
       chosedType   = {label: '(none)', value: undefined};
   
+  var ATTRS               = 'attrs',
+      ABSOLUTE_METRICS    = 'abs_metrics',
+      RELATIVE_METRICS    = 'rel_metrics',
+      MODERATE_AGGRESSIVE = 'Moderate Aggressive';
+  
   var utils = {
     isFunction : function(obj) {
       return typeof obj == 'function' || false;
+    },
+    yearToTimestamp : function (year) {
+      var res = 'cumulative';
+      if (_.isNumber(year)) {
+        res = moment.utc((year-1)+'-12-31').business(true).format("X")*1000;
+      }
+      return res; 
+    },
+    round: function (n) {
+      var st = Math.pow(10, n);
+      return function (v) {
+        return Math.round(Number(v)*st)/st;
+      };
     }
   };
   
 
-  var timeSeriesChart = function(type) {
+  var timeSeriesChart = function() {
 
     var margin     = {top: 0, right: 20, bottom: 20, left: 50},
         svgWidth   = 580,
         svgHeight  = 340,
         width      = svgWidth,
         height     = svgHeight,
-        chart_type = type,
+        chart_type = 'relative_price',
         xValue = function(d) { return d[0]; },
         yValue = function(d) { return d[1]; },
         xScale = d3.time.scale(),
@@ -75,9 +93,36 @@
         brushCallback,
         chooseYearClb;
     
+    function prepareData(newData){
+      var intermediateRes, 
+        results = {};
+        
+      intermediateRes = _.chain(chartTypes)
+        .map(function(chartType){
+          return newData[chartType][chartType];
+        })
+        .value();
+        
+      _.each(intermediateRes[1], function(data, key){
+        results[key] = _.chain(data)
+          .map(function(k, v){
+            return {
+              x: Number(v)/1000,
+              y: k };
+          })
+          .filter(function(o){ return !_.isNaN(o.x); })
+          .sortBy(function(o){ return o.x; })
+          .value();
+        });
+      
+      return results;
+    }
+    
     function chart(selection) {
-      selection.each(function(data) {
-
+      selection.each(function(newData) {
+        
+        var data = prepareData(newData);
+        
         width  = svgWidth - margin.left - margin.right;
         height = svgHeight - margin.bottom;
         
@@ -187,13 +232,6 @@
               "translate(" + margin.left + "," + margin.top + ")"
              );
 
-        gEnter.selectAll(".resize").append('image')
-          .attr('xlink:href', '/images/arrowUp.jpg')
-          .attr('width', "20px")
-          .attr('height', "20px");
-          
-        gEnter.selectAll('.resize.w image').attr('x', "-10");
-        gEnter.selectAll('.resize.e image').attr('x', "-8");
 
         g.select(".y.axis")
           .transition()
@@ -228,14 +266,16 @@
           }
         });
         
-        //d3.select(mainGraph)
+        var that = this;
+        
         svg.selectAll(".x.axis .tick text")
           .on('click', function(date, index){
-            console.log(date, index);
-            console.log(typeof(date));
             window.date = date;
             if(utils.isFunction(chooseYearClb)){
               chooseYearClb(date, index);
+              console.log(date);
+              var startDate = moment(date).subtract(1, 'year').toDate();
+              chart.change_brush(that, startDate, date);
             }
           });
         
@@ -311,8 +351,124 @@
       chooseYearClb = _;
       return chart;
     };
+    
+    chart.chartType = function(_) {
+      if (!arguments.length) return chart_type;
+      chart_type = _;
+      return chart;
+    };
 
     return chart;
+  };
+  
+  var relativeMetricsTable = function() {
+    
+     var horizontalMap = [
+       'beta', 'risk_adjusted_excess_return', 
+       'alpha', 'upcapture', 'downcapture'
+        ],
+     year;
+     
+     function mapData(inData){
+       var dtKey = utils.yearToTimestamp(year),
+       out = 
+         _.chain(horizontalMap)
+           .map(function(key){
+              return inData[key][MODERATE_AGGRESSIVE][dtKey];
+            })
+            .map(utils.round(3))
+            .value();
+       return out;
+     }
+     
+     function chart(selection) {
+      selection.each(function(rawData){
+        var data = mapData(rawData),
+            line = d3.select(this).selectAll("td").data(data);
+
+        line.transition().text(function(d){ return d; });
+
+        
+      });
+     };
+     
+    chart.setYear = function(_y){
+      if (!arguments.length) return year;
+      if (_.isNumber(_y)) {
+        year = _y;
+      } else {
+        throw 'Year must be a number!';
+      }
+      return chart;
+    };
+    
+    chart.resetYear = function(){
+      year = undefined;
+      return chart;
+    }
+     
+     return chart;
+  };
+  
+  
+  var absoluteMetricsTable = function() {
+    
+    var horizontalMap = [
+         'annualized_return', 
+         'annualized_vol', 
+         'sharpe_ratio', 
+         'sortino_ratio', 
+         'max_drawdown'
+          ],
+        verticalMap = [
+          'Client Strategy', 
+          'Moderate Aggressive'],
+        year;
+     
+     function mapData(inData) {
+       var out  = [[], []],
+          dtKey = utils.yearToTimestamp(year);
+       _.chain(horizontalMap)
+         .each(function(key, index){
+           _.each(_.range(2), function(r){
+             var val = inData[key][verticalMap[r]][dtKey];
+                 val = utils.round(3)(val);
+             out[r].push(val);
+           });
+         })
+         .value();
+       return out;
+     }
+     
+     function chart(selection) {
+      selection.each(function(rawData){
+        var data = mapData(rawData),
+            line1 = d3.select(this).selectAll(".l1 td").data(data[0]),
+            line2 = d3.select(this).selectAll(".l2 td").data(data[1]);
+
+        line1.transition().text(function(d){ return d; });
+        line2.transition().text(function(d){ return d; });
+        
+      });
+     };
+     
+    chart.setYear = function(_y){
+      if (!arguments.length) return year;
+      if (_.isNumber(_y)) {
+        year = _y;
+      } else {
+        throw 'Year must be a number!';
+      }
+      return chart;
+    };
+    
+    chart.resetYear = function(){
+      year = undefined;
+      return chart;
+    }
+    
+     return chart;
+     
   };
   
   var assetPieChart = function() {
@@ -326,16 +482,40 @@
   
     var year;
     
+    function prepareData(newData){
+      var AC_WTS = 'ac_wts-mean';
+      var keyToGet, dtCheck;
+      if(_.isNumber(year)) {
+        keyToGet = utils.yearToTimestamp(year);
+      } else {
+        keyToGet = 'cumulative';
+      }
+      var results = 
+        _.chain(newData[AC_WTS])
+          .map(function(val, key){
+            return {
+              label: key,
+              value: val[keyToGet]
+            }
+          })
+          .sort(function(val){
+            return val.label;
+          })
+          .value();
+      
+      return results;
+    }
+    
     function chart(selection) {
-      selection.each(function(data) {
-        
+      selection.each(function(newData) {
+        var data = prepareData(newData);
         var svg = d3.select(this).selectAll("svg").data([data]);
         
         var gEnter = 
           svg.enter()
-          .append("svg")
-          .append('g')
-          .attr('class', 'acw');
+            .append("svg")
+            .append('g')
+            .attr('class', 'acw');
         
         gEnter.append("g")
           .attr("class", "slices");
@@ -510,10 +690,13 @@
       return chart;
     };
     
-    
-    chart.setYear = function(_){
+    chart.setYear = function(_y){
       if (!arguments.length) return year;
-      year = _;
+      if (_.isNumber(_y)) {
+        year = _y;
+      } else {
+        throw 'Year must be a number!';
+      }
       return chart;
     };
     
@@ -522,134 +705,127 @@
       return chart;
     }
     
-    
     return chart;
     
   };
   
-  /* MAIN */
+  var updateYear = function(root, year){
+    var what = _.clone(year);
+    if(!_.isNumber(year)){
+      what = 'cumulative';
+    }
+    _.each(
+      root.querySelectorAll('.year-title'), 
+      function(t){ 
+        return t.innerText = what; 
+      }
+    );
+  }
+  
+  
+  /* MAIN ROOT NODES */
   
   var host     = document.querySelector(_scw.id),
       root     = host.createShadowRoot(),
       styleElm = document.createElement('style'),
       tmplElm  = document.createElement('div');
-      
-  window.root = root;
+    	
   
   styleElm.innerHTML = widgetStyles;
   tmplElm.innerHTML  = widgetTmpl;
   root.appendChild(styleElm);
   root.appendChild(tmplElm);
   
+  window.root = root;
+  
   var mainGraph = root.querySelector('.mg'),
-      apGraph   = root.querySelector('.cg');
-      
-      
+      apGraph   = root.querySelector('.cg'),
+      amTable   = root.querySelector('.am'),
+      rmTable   = root.querySelector('.rm');
+
+
+  /* GRAPH INITS */
+  
   var apChart = 
-      assetPieChart()
-        .width(520)
-        .height(240)
-        .reRalcRadius();
-        
+    assetPieChart()
+      .width(520)
+      .height(240)
+      .reRalcRadius();
+  
   var drawCircleChart = function(newData, year) { 
-    var AC_WTS = 'ac_wts-mean';
-    var keyToGet, dtCheck;
     
-    if (_.isObject(newData)) {
-      if(_.isNumber(year)) {
-
-        keyToGet = 
-          moment
-          .utc((year-1)+'-12-31')
-          .business(true)
-          .format("X")*1000;
-          
-        apChart.setYear(year);
-
-      } else {
-        keyToGet = 'cumulative';
-        apChart.resetYear();
-      }
-      
-      var results = 
-          _.chain(newData[AC_WTS])
-            .map(function(val, key){
-              return {
-                label: key,
-                value: val[keyToGet]
-              }
-            })
-            .sort(function(val){
-              return val.label;
-            })
-            .value();
-      
-      if(!_.includes(_.pluck(results, 'value'), undefined)){
-        d3.select(apGraph)
-          .datum(results)
-          .call(apChart);
-      }
-      
-      
+    if(_.isNumber(year)) {
+      apChart.setYear(year);
+    } else {
+      apChart.resetYear();
     }
+    
+    d3.select(apGraph)
+      .datum(newData)
+      .call(apChart);
   };
   
-  drawCircleChart(__WidgetData['attrs']);
   
-  var chart = timeSeriesChart(chartTypes[0])
+  var amTableD = absoluteMetricsTable();
+  
+  function drawAbsoluteTable(data, year){
+    
+    if(_.isUndefined(year)){
+      amTableD.resetYear();
+    } else {
+      amTableD.setYear(year);
+    }
+    
+    d3.select(amTable)
+      .datum(data)
+      .call(amTableD);
+  };
+  
+  var rmTableD = relativeMetricsTable();
+  
+  function drawRelativeTable(data, year){
+    
+    if(_.isUndefined(year)){
+      rmTableD.resetYear();
+    } else {
+      rmTableD.setYear(year);
+    }
+    
+    d3.select(rmTable)
+      .datum(data)
+      .call(rmTableD);
+  };
+  
+  var chart = 
+    timeSeriesChart()
       .x(function(o){ return o.x; })
       .y(function(o){ return o.y; })
+      .chartType(chartTypes[0])
       .chooseYear(function(dt, index){
-        drawCircleChart(__WidgetData['attrs'], dt.getFullYear());
+        var y = dt.getFullYear();
+        if (y > 2008) {
+          updateYear(root, y);
+          drawCircleChart(__WidgetData[ATTRS], y);
+          drawAbsoluteTable(__WidgetData[ABSOLUTE_METRICS], y);
+          drawRelativeTable(__WidgetData[RELATIVE_METRICS], y);
+        } else {
+          updateYear(root);
+          drawCircleChart(__WidgetData[ATTRS]);
+          drawAbsoluteTable(__WidgetData[ABSOLUTE_METRICS]);
+          drawRelativeTable(__WidgetData[RELATIVE_METRICS]);
+        }
       });
    
-  var drawMainChart = function(newData, chartTypes) {
-    if (_.isObject(newData)) {
-      
-      types = [];
-      
-      var intermediateRes, 
-          results = {};
-          
-      intermediateRes = _.chain(chartTypes)
-        .map(function(chartType){
-          return newData[chartType][chartType];
-        })
-        .value();
-      _.each(intermediateRes[1], function(data, key){
-        types.push({
-          label: key.replace(' ', '-'),
-          value: key
-        });
-        results[key] = _.chain(data)
-          .map(function(k, v){
-            return {
-              x: Number(v)/1000,
-              y: k };
-          })
-          .filter(function(o){ return !_.isNaN(o.x); })
-          .sortBy(function(o){ return o.x; })
-          .value();
-        });
-      if (chosedType.value === undefined){ 
-        chosedType = types[0];
-      } else {
-        var renew_value = _.where(types, {value: chosedType.value});
-        if (renew_value.length > 0){
-          chosedType = renew_value[0];
-        } else {
-          chosedType = types[0];
-        }
-      };
-  
-      d3.select(mainGraph)
-        .datum(results)
-        .call(chart);
-    }
+  var drawMainChart = function(newData) {
+    d3.select(mainGraph)
+      .datum(newData)
+      .call(chart);
   };
   
-  drawMainChart(__WidgetData, chartTypes);
   
-  
+  drawCircleChart(__WidgetData[ATTRS]);
+  drawAbsoluteTable(__WidgetData[ABSOLUTE_METRICS]);
+  drawRelativeTable(__WidgetData[RELATIVE_METRICS]);
+  drawMainChart(__WidgetData);
 
-})(window, _scw, _scw_data, __sc_cs, __sc_tmpl);
+})(window, __sc_cs, __sc_tmpl);
