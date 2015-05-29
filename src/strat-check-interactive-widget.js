@@ -97,14 +97,13 @@
     function prepareData(newData){
       var intermediateRes, 
         results = {};
-      //console.log(newData)
+      
       intermediateRes = _.chain(chartTypes)
         .map(function(chartType){
           return newData[chartType][chartType];
         })
         .value();
-      //console.log(intermediateRes);
-      //console.log(chartTypes, chart_type, chartTypes.indexOf(chart_type));
+      
       _.each(intermediateRes[chartTypes.indexOf(chart_type)], function(data, key){
         results[key] = _.chain(data)
           .map(function(k, v){
@@ -116,7 +115,7 @@
           .sortBy(function(o){ return o.x; })
           .value();
         });
-      //console.log(results);
+      
       return results;
     }
     
@@ -124,7 +123,7 @@
       selection.each(function(newData) {
         
         var data = prepareData(newData);
-        console.log(data);
+
         width  = svgWidth - margin.left - margin.right;
         height = svgHeight - margin.bottom;
         
@@ -230,7 +229,6 @@
         enterLines
           .transition(1500)
           .attr('d', function(d){
-            console.log(d); 
             return line(d); 
           });
            
@@ -838,7 +836,6 @@
   };
   
   switcherElm.onchange = function(){
-    console.log(switcherElm.checked);
     
     if (switcherElm.checked) {
       chart.chartType('growth_of_one_dollar');
