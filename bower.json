@@ -21,6 +21,7 @@
   "dependencies": {
     "d3": "~3.5.5",
     "moment": "~2.10.2",
-    "lodash": "~3.8.0"
+    "lodash": "~3.8.0",
+    "switchery": "~0.8.0"
   }
 }

@@ -56,6 +56,7 @@
         svgHeight  = 340,
         width      = svgWidth,
         height     = svgHeight,
+        
         chart_type = 'relative_price',
         xValue = function(d) { return d[0]; },
         yValue = function(d) { return d[1]; },
@@ -70,7 +71,7 @@
           .orient("left")
           .ticks(6)
           .tickFormat(function(d){
-            if (chart_type == 'relative'){
+            if (chart_type == 'relative_price'){
               return Number(Number(d) * 100) + "%";
             } else {
               return "$" + d.toFixed(2);
@@ -96,14 +97,15 @@
     function prepareData(newData){
       var intermediateRes, 
         results = {};
-        
+      //console.log(newData)
       intermediateRes = _.chain(chartTypes)
         .map(function(chartType){
           return newData[chartType][chartType];
         })
         .value();
-        
-      _.each(intermediateRes[1], function(data, key){
+      //console.log(intermediateRes);
+      //console.log(chartTypes, chart_type, chartTypes.indexOf(chart_type));
+      _.each(intermediateRes[chartTypes.indexOf(chart_type)], function(data, key){
         results[key] = _.chain(data)
           .map(function(k, v){
             return {
@@ -114,7 +116,7 @@
           .sortBy(function(o){ return o.x; })
           .value();
         });
-      
+      //console.log(results);
       return results;
     }
     
@@ -122,7 +124,7 @@
       selection.each(function(newData) {
         
         var data = prepareData(newData);
-        
+        console.log(data);
         width  = svgWidth - margin.left - margin.right;
         height = svgHeight - margin.bottom;
         
@@ -214,12 +216,25 @@
 
         gEnter.append('g').attr('class', 'paths');
         
-        _.each(data, function(value, key){
-          gEnter.select('.paths')
-            .append("path")
-            .attr("class", "line " + key.replace(' ', '-'))
-            .attr('d', line(value));
-        });
+        var enterLines = svg
+          .select('.paths')
+          .selectAll('.line')
+          .data(_.values(data));
+        
+        enterLines.enter()
+          .append("path")
+          .attr('class', function(d){
+            return 'line'; 
+           });
+        
+        enterLines
+          .transition(1500)
+          .attr('d', function(d){
+            console.log(d); 
+            return line(d); 
+          });
+           
+         enterLines.exit().remove();
 
         // Update the outer dimensions.
         svg.attr("width", svgWidth)
@@ -231,7 +246,6 @@
               "transform", 
               "translate(" + margin.left + "," + margin.top + ")"
              );
-
 
         g.select(".y.axis")
           .transition()
@@ -273,7 +287,6 @@
             window.date = date;
             if(utils.isFunction(chooseYearClb)){
               chooseYearClb(date, index);
-              console.log(date);
               var startDate = moment(date).subtract(1, 'year').toDate();
               chart.change_brush(that, startDate, date);
             }
@@ -728,8 +741,9 @@
   var host     = document.querySelector(_scw.id),
       root     = host.createShadowRoot(),
       styleElm = document.createElement('style'),
-      tmplElm  = document.createElement('div');
-    	
+      tmplElm  = document.createElement('div'),
+      switcherElm = document.querySelector('.js');
+      
   
   styleElm.innerHTML = widgetStyles;
   tmplElm.innerHTML  = widgetTmpl;
@@ -738,12 +752,13 @@
   
   window.root = root;
   
-  var mainGraph = root.querySelector('.mg'),
-      apGraph   = root.querySelector('.cg'),
-      amTable   = root.querySelector('.am'),
-      rmTable   = root.querySelector('.rm');
+  var mainGraph   = root.querySelector('.mg'),
+      apGraph     = root.querySelector('.cg'),
+      amTable     = root.querySelector('.am'),
+      rmTable     = root.querySelector('.rm'),
+      switcherElm = root.querySelector('.js');
 
-
+  var init = new Switchery(switcherElm);
   /* GRAPH INITS */
   
   var apChart = 
@@ -822,6 +837,16 @@
       .call(chart);
   };
   
+  switcherElm.onchange = function(){
+    console.log(switcherElm.checked);
+    
+    if (switcherElm.checked) {
+      chart.chartType('growth_of_one_dollar');
+    } else {
+      chart.chartType('relative_price');
+    }
+    drawMainChart(__WidgetData);
+  };
   
   drawCircleChart(__WidgetData[ATTRS]);
   drawAbsoluteTable(__WidgetData[ABSOLUTE_METRICS]);
@@ -829,3 +854,4 @@
   drawMainChart(__WidgetData);
 
 })(window, __sc_cs, __sc_tmpl);
+ 
