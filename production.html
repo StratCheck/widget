@@ -3,7 +3,8 @@
   <head>
     <meta charset="UTF-8">
     <title>Widget test page</title>
-  	<meta name="robots" content="nofollow" />
+    <meta name="robots" content="nofollow" />
+    
   </head>
   <body>
     <widget id="test-widget"></widget>
@@ -13,7 +14,7 @@
 
     (function() {
       var scw = document.createElement('script'); scw.type = 'text/javascript'; scw.async = true;
-      scw.src = '//localhost:9000/build/strat-check-interactive-widget.min.js';
+      scw.src = 'build/strat-check-interactive-widget.min.js';
       var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(scw, s);
     })();
 
