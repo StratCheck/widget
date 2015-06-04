@@ -1,4 +1,7 @@
-body{
+.widget, body{
+  display: block;
+  width: 1124px;
+  height: 780px;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #A4A4A4;
 }
@@ -6,18 +9,103 @@ body{
 .lc, .rc{
   float:left;
   text-align: center;
-  padding: 15px;
+  padding: 0px;
 }
 
-.row{
+.lc{
+  width:590px;
+}
+
+.lc .cdt{
+  margin-top: 25px;
+  display: block;
+  font-size: 10px;
+  line-height: 10px;
+}
+
+.cg{
+  margin-top: 90px;
+}
+
+.rm{
+  width: 530px;
+}
+
+.row:after{
+  clear: both;
+  content: " ";
+  display: table
+}
+
+.clearfix{
   clear: both;
 }
 
-h2{
-  color: #333333;
+h2, caption{
   text-transform: uppercase;
   font-size: 16px;
+  color: #333333;
+  font-weight: 400;
+  margin: 0;
 }
+
+.switch {
+  margin: 30px 0;
+}
+.switch .l, .switch .r{
+  text-transform: uppercase;
+  font-size: 12px;
+}
+.switch .on{
+  color: #64b2e4;
+}
+
+.switchery {
+  background-color: #fff;
+  border: 1px solid #dfdfdf;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-block;
+  height: 14px;
+  position: relative;
+  vertical-align: middle;
+  width: 25px;
+
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+
+  -webkit-background-clip: content-box;
+  background-clip: content-box;
+  
+  margin: 0 10px;
+}
+
+.switchery > small {
+  background: #fff;
+  border-radius: 100%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  height: 14px;
+  position: absolute;
+  top: 0;
+  width: 14px;
+}
+.year-title{
+  display: block;
+  margin: 10px 0 25px 0;
+  font-size: 10px;
+}
+
+.row.last{
+  margin-top: 60px;
+}
+
 small{
   text-transform: uppercase;
 }
@@ -34,6 +122,11 @@ svg{
 
 .acw text{
   fill: #787878;
+}
+
+.x.axis .tick text{
+  cursor: pointer;
+  fill: #64b1e0;
 }
 
 path.slice{
@@ -64,7 +157,7 @@ polyline{
 
 .line {
   fill: none;
-  stroke: steelblue;
+  stroke: #467990;
   stroke-width: 1.5px;
 }
 
@@ -92,15 +185,15 @@ g.custom_tick line {
 }
 
 path.line {
-  opacity: .2;
+  opacity: .8;
 }
 
 path.line:hover {
-  opacity: 0.8;
+  opacity: 1.0;
 }
 
 path.line.active {
-  opacity: 1;
+  opacity: 1.0;
 }
 
 .brush .background {
@@ -204,62 +297,37 @@ path.line.active {
   stroke-width: 10px;
 }
 
-
-.switchery {
-  background-color: #fff;
-  border: 1px solid #dfdfdf;
-  border-radius: 8px;
-  cursor: pointer;
-  display: inline-block;
-  height: 16px;
-  position: relative;
-  vertical-align: middle;
-  width: 25px;
-
-  -moz-user-select: none;
-  -khtml-user-select: none;
-  -webkit-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-
-  -webkit-box-sizing: content-box;
-  -moz-box-sizing: content-box;
-  box-sizing: content-box;
-
-  -webkit-background-clip: content-box;
-  background-clip: content-box;
+table{
+  margin: 0 auto;
+  border-collapse: collapse;
 }
 
-.switchery > small {
-  background: #fff;
-  border-radius: 100%;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-  height: 16px;
-  position: absolute;
-  top: 0;
-  width: 16px;
+table th, table td{
+  width: 80px;
+  height: 45px;
+  font-size:12px;
+  color:#333333;
+  font-weight: normal;
 }
 
-/* Switchery sizes. */
-
-.switchery-small {
-  border-radius: 20px;
-  height: 20px;
-  width: 33px;
+table thead th{
+  color: #979797;
 }
 
-.switchery-small > small {
-  height: 20px;
-  width: 20px;
+table td{
+  color: #363636;
+  background-color: #e5e5e5;
+  border: 1px solid #fff;
 }
 
-.switchery-large {
-  border-radius: 40px;
-  height: 40px;
-  width: 66px;
+table td.red{
+  color: #a42529;
+  border: 1px solid #952428;
+  background-color: #f8f2f2;
 }
 
-.switchery-large > small {
-  height: 40px;
-  width: 40px;
+table td.green{
+  color: #3d663a;
+  border:1px solid #7bb651;
+  background-color: #f3faf1;
 }

@@ -742,13 +742,13 @@
       tmplElm  = document.createElement('div'),
       switcherElm = document.querySelector('.js');
       
-  
+  tmplElm.className = 'widget';
   styleElm.innerHTML = widgetStyles;
   tmplElm.innerHTML  = widgetTmpl;
   root.appendChild(styleElm);
   root.appendChild(tmplElm);
   
-  window.root = root;
+  //window.root = root;
   
   var mainGraph   = root.querySelector('.mg'),
       apGraph     = root.querySelector('.cg'),
@@ -756,7 +756,7 @@
       rmTable     = root.querySelector('.rm'),
       switcherElm = root.querySelector('.js');
 
-  var init = new Switchery(switcherElm);
+  var init = new Switchery(switcherElm, {color: '#9a9a9a', secondaryColor: '#9a9a9a'});
   /* GRAPH INITS */
   
   var apChart = 
