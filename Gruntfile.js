@@ -8,9 +8,28 @@ module.exports = function(grunt) {
         banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
       },
       build: {
-        src : 'src/<%= pkg.name %>.js',
-        dest: 'build/<%= pkg.name %>.min.js'
+        src : [
+          //'bower_components/d3/d3.min.js',
+          'bower_components/lodash/lodash.js',
+          'bower_components/moment/moment.js',
+          'bower_components/switchery/dist/switchery.js',
+          
+          'src/buisness_moment.js', 
+          'src/styles.js', 
+          'src/tmpl.js', 
+          'src/<%= pkg.name %>.js'
+        ],
+        dest: 'build/<%= pkg.name %>.js'
       }
+    },
+    concat: {
+      options: {
+        separator: ';',
+      },
+      dist: {
+        src: ['bower_components/d3/d3.min.js', 'build/<%= pkg.name %>.js'],
+        dest: 'build/<%= pkg.name %>.min.js',
+      },
     },
     convert_style : {
       'src'  : 'src/charts.css',
@@ -28,10 +47,29 @@ module.exports = function(grunt) {
 
   grunt.loadNpmTasks('grunt-serve');
   
-  // Default task(s).
-  grunt.registerTask('default', ['convert_style', 'uglify']);
+  grunt.loadNpmTasks('grunt-contrib-concat');
   
-  grunt.registerTask('precompileassets', ['convert_template', 'convert_style', 'uglify']);
+  
+  // Default task(s).
+  grunt.task.registerTask(
+    'default', 
+    [
+      'convert_template',
+      'convert_style', 
+      'uglify:build', 
+      'concat'
+    ]);
+  
+  grunt.task.registerTask(
+    'build_prod', 
+    [
+      'convert_template',
+      'convert_style', 
+      'uglify:build', 
+      'concat'
+    ]);
+  
+  grunt.task.registerTask('precompileassets', ['convert_template', 'convert_style']);
   
   // My custom grunt tasks:
   grunt.registerTask('convert_style', 
@@ -48,7 +86,10 @@ module.exports = function(grunt) {
           tmpl     = "'use strict';window.__sc_cs ='{{styles}}';";
       
       fs.readFile(fileSrc, {encoding: "utf8"}, function(err, data){
-        if (err) throw err;
+        if (err){
+          done(false);
+          throw err;
+        }
         grunt.log.writeln('Read file:'+fileSrc);
         
         grunt.log.writeln('Minify css data.');
@@ -56,8 +97,12 @@ module.exports = function(grunt) {
             outData = tmpl.replace('{{styles}}', minifiedData);
         
         fs.writeFile(fileOut, outData, function (err) {
-          if (err) throw err;
+          if (err){
+            done(false);
+            throw err;
+          }
           grunt.log.writeln('Style file has bean saved to:'+fileOut);
+          done(true);
         });
         
       });
@@ -79,7 +124,10 @@ module.exports = function(grunt) {
       
       fs.readFile(fileSrc, {encoding: "utf-8"}, function(err, data){
 
-        if (err) throw err;
+        if (err) {
+          done(false);
+          throw err;
+        }
         grunt.log.writeln('Read file:'+fileSrc);
         
         grunt.log.writeln('Minify html data.');
@@ -88,8 +136,12 @@ module.exports = function(grunt) {
         var outData = tmpl.replace('{{template}}', minifiedData);
         
         fs.writeFile(fileOut, outData, function (err) {
-          if (err) throw err;
+          if (err) {
+            done(false);
+            throw err;
+          }
           grunt.log.writeln('Template file has bean saved to:'+fileOut);
+          done(true);
         });
         
       });
