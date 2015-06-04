@@ -741,14 +741,16 @@
       styleElm = document.createElement('style'),
       tmplElm  = document.createElement('div'),
       switcherElm = document.querySelector('.js');
-      
-  tmplElm.className = 'widget';
+  
+  tmplElm.className = 'widget strat-check-a04g5ewen4tggb9';
   styleElm.innerHTML = widgetStyles;
   tmplElm.innerHTML  = widgetTmpl;
-  root.appendChild(styleElm);
+  if(Platform.shadowDOM === 'polyfill') {
+    document.querySelector('head').appendChild(styleElm);
+  } else {
+    root.appendChild(styleElm);
+  }
   root.appendChild(tmplElm);
-  
-  //window.root = root;
   
   var mainGraph   = root.querySelector('.mg'),
       apGraph     = root.querySelector('.cg'),

@@ -9,8 +9,7 @@ module.exports = function(grunt) {
       },
       build: {
         src : [
-          //'bower_components/d3/d3.min.js',
-          'src/ShadowDOM.min.js', 
+          'src/ShadowDOM.js', 
           'bower_components/lodash/lodash.js',
           'bower_components/moment/moment.js',
           'bower_components/switchery/dist/switchery.js',
@@ -30,7 +29,6 @@ module.exports = function(grunt) {
       dist: {
         src: [
           'bower_components/d3/d3.min.js', 
-          //'src/ShadowDOM.min.js', 
           'build/<%= pkg.name %>.js'
         ],
         dest: 'build/<%= pkg.name %>.min.js',

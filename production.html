@@ -15,7 +15,7 @@
     (function() {
       var scw = document.createElement('script'); scw.type = 'text/javascript'; scw.async = true;
       scw.src = 'build/strat-check-interactive-widget.min.js';
-      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(scw, s);
+      var s = document.getElementsByTagName('body')[0]; s.appendChild(scw);
     })();
 
   </script>
