@@ -846,7 +846,7 @@
   
   }
   
-  d3.json('http://api.stratcheck.io/v1/widget/'+_scw.sid, function(error,data){
+  d3.json('http://api.stratcheck.io/v1/widget/'+_scw.widget_id, function(error,data){
     if(error) {
       console.log(error);
     } else {
