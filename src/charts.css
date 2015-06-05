@@ -6,6 +6,10 @@
   color: #A4A4A4;
 }
 
+.strat-check-a04g5ewen4tggb9 .x.brush {
+  pointer-events:none!important;
+}
+
 .strat-check-a04g5ewen4tggb9 .lc, 
 .strat-check-a04g5ewen4tggb9 .rc{
   float:left;
@@ -50,7 +54,7 @@
   font-weight: 400;
   margin: 0;
 }
-
+ 
 .strat-check-a04g5ewen4tggb9  .switch {
   margin: 30px 0;
 }
@@ -58,6 +62,10 @@
 .strat-check-a04g5ewen4tggb9 .switch .r{
   text-transform: uppercase;
   font-size: 12px;
+}
+
+.strat-check-a04g5ewen4tggb9  .switch .checked{
+  color:#00b3e7;
 }
 
 .strat-check-a04g5ewen4tggb9 .switch .on{
@@ -199,13 +207,14 @@
 }
 
 .strat-check-a04g5ewen4tggb9 .brush .background {
-  fill: black;
-  opacity: .1;
+  fill: none;
+  opacity: 1;
   visibility: visible;
 }
 
 .strat-check-a04g5ewen4tggb9 .brush .extent {
-  fill: white;
+  fill:#F1F1F1;
+  stroke: #f1f1f1;
   opacity: 1;
   fill-opacity: 1;
 }

@@ -1,6 +1,5 @@
 /* global __sc_tmpl */
 /* global __sc_cs */
-/* global _scw_data */
 /* global Exception */
 /* global _ */
 //TODO: Remove and change to d3.time.format if it possible
@@ -27,7 +26,7 @@
     yearToTimestamp : function (year) {
       var res = 'cumulative';
       if (_.isNumber(year)) {
-        res = moment.utc((year-1)+'-12-31').business(true).format("X")*1000;
+        res = moment.utc(year+'-12-31').business(true).format("X")*1000;
       }
       return res; 
     },
@@ -106,7 +105,7 @@
           .sortBy(function(o){ return o.x; })
           .value();
         });
-      
+      var ts = _.chain(results['Moderate Aggressive']).map(function(e){ return e.x; });
       return results;
     }
     
@@ -160,8 +159,7 @@
 
         if (brush.empty()){
           brush.extent(xDomain);
-        }
-        else{
+        } else{
           // redraw selection on resize;
           brush.extent(brush.extent());
         }
@@ -191,7 +189,10 @@
         svg.selectAll(".x.axis text")
           .transition()
           .duration(1500)
-          .attr("y", 10);
+          .attr("y", 10)
+          .attr('class', function(d){
+            return 'y'+d.getFullYear();
+          });
 
         gEnter.select('.x.axis')
           .append("g")
@@ -247,7 +248,9 @@
           .attr("x", -10);
 
         g.select('.x.brush').call(brush);
-
+        
+        g.select('.x.brush .resize').remove();
+        
         g.select('.border-rect')
          .transition()
          .duration(1500)
@@ -273,11 +276,10 @@
         
         svg.selectAll(".x.axis .tick text")
           .on('click', function(date, index){
-            window.date = date;
             if(utils.isFunction(chooseYearClb)){
               chooseYearClb(date, index);
-              var startDate = moment(date).subtract(1, 'year').toDate();
-              chart.change_brush(that, startDate, date);
+              var endDate = moment(date).add(1, 'year').toDate();
+              chart.change_brush(that, date, endDate);
             }
           });
         
@@ -814,17 +816,39 @@
         .y(function(o){ return o.y; })
         .chartType(chartTypes[0])
         .chooseYear(function(dt, index){
-          var y = dt.getFullYear();
-          if (y > 2008) {
+          var y = dt.getFullYear(),
+              texts = root.querySelectorAll('.x.axis .tick text');
+              
+          _.chain(texts)
+            .each(function(elm, i){
+              elm.style.fill = '#64b1e0';
+            })
+            .value();
+              
+          if (y < 2015) {
             updateYear(root, y);
             drawCircleChart(__WidgetData[ATTRS], y);
             drawAbsoluteTable(__WidgetData[ABSOLUTE_METRICS], y);
             drawRelativeTable(__WidgetData[RELATIVE_METRICS], y);
+            
+            root.querySelector('.x.brush').style.opacity = '1';
+            
+            _.chain(texts)
+              .filter(function(elm, i){
+                return Number(elm.innerHTML) !== y;
+              })
+              .each(function(elm, i){
+                elm.style.fill = '#999999';
+              })
+              .value();
+            
           } else {
             updateYear(root);
             drawCircleChart(__WidgetData[ATTRS]);
             drawAbsoluteTable(__WidgetData[ABSOLUTE_METRICS]);
             drawRelativeTable(__WidgetData[RELATIVE_METRICS]);
+            
+            root.querySelector('.x.brush').style.opacity = '0';
           }
         });
      
@@ -835,12 +859,13 @@
     };
     
     switcherElm.onchange = function(){
-      
       if (switcherElm.checked) {
         chart.chartType('growth_of_one_dollar');
       } else {
         chart.chartType('relative_price');
       }
+      root.querySelector('.switch .l').classList.toggle('checked');
+      root.querySelector('.switch .r').classList.toggle('checked');
       drawMainChart(__WidgetData);
     };
     
