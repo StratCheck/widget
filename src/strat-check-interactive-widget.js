@@ -726,17 +726,22 @@
   
   
   /* MAIN ROOT NODES */
+  var root; 
   
   function main() {
-    var host   = document.querySelector(_scw.id),
-      root     = host.createShadowRoot(),
-      styleElm = document.createElement('style'),
-      tmplElm  = document.createElement('div'),
-      switcherElm = document.querySelector('.js');
+    
+    var host = document.querySelector(_scw.id);
+    
+    root = host.createShadowRoot();
+      
+    var styleElm    = document.createElement('style'),
+        tmplElm     = document.createElement('div'),
+        switcherElm = document.querySelector('.js');
   
-    tmplElm.className = 'widget strat-check-a04g5ewen4tggb9';
+    tmplElm.className  = 'widget strat-check-a04g5ewen4tggb9';
     styleElm.innerHTML = widgetStyles;
     tmplElm.innerHTML  = widgetTmpl;
+    
     if(Platform.shadowDOM === 'polyfill') {
       document.querySelector('head').appendChild(styleElm);
     } else {
@@ -846,15 +851,21 @@
   
   }
   
-  d3.json('http://api.stratcheck.io/v1/widget/'+_scw.widget_id, function(error,data){
-    if(error) {
-      console.log(error);
-    } else {
-      __WidgetData = data;
-      main();
+  d3.json(
+    'http://api.stratcheck.io/v1/widget/'+_scw.widget_id, 
+    function(error, data){
+      if(error) {
+        console.log(error);
+      } else {
+        __WidgetData = data;
+        main();
+        document.querySelector('#test-widget').style.background = '';
+          _.each(root.querySelectorAll('.row'), function(elm){
+          elm.style.display = 'block';
+        });
+      }
     }
-      
-  });
+  );
 
 })(window, __sc_cs, __sc_tmpl);
  
