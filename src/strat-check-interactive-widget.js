@@ -207,11 +207,33 @@
 
         gEnter.append('g').attr('class', 'paths');
         
+        var gEnterLoup = gEnter
+             .selectAll(".x.axis .tick")
+             .append('g')
+             .attr('class', function(d){
+                return 'loup-icon y'+d.getFullYear();
+              });
+            
+          gEnterLoup
+            .append('image')
+            .attr('xlink:href', _scw.icons_prifex + 'build/loup.png')
+            .attr('x', -34)
+            .attr('y', 8)
+            .attr('height', '14px')
+            .attr('width', '14px');
+          
+          gEnterLoup
+            .append('line')
+            .attr('x1', -34)
+            .attr('y1', 28)
+            .attr('x2', 18)
+            .attr('y2', 28);
+          
         var gEnterCircle = gEnter
             .selectAll(".x.axis .tick")
             .append('g')
             .attr('class', function(d, i){
-              return 'icon-cross y'+d.getFullYear();
+              return 'icon-cross y' + d.getFullYear();
             })
             .attr('style', 'visibility: hidden;')
             .on('click', function(d, i){
@@ -231,9 +253,6 @@
               .attr('x', '-29.5px')
               .attr('y', '18px')
               .text('x');
-              
-        
-        console.log(d3.selectAll('.icon-cross'));
         
         var enterLines = svg
           .select('.paths')
@@ -301,6 +320,16 @@
         });
         
         var that = this;
+        
+        svg.selectAll(".x.axis .tick text")
+          .on('mouseover', function(d, i){
+            var _y = '.loup-icon.y' + d.getFullYear();
+            svg.select(_y).attr('style', 'visibility:visible;');
+          })
+          .on('mouseout', function(d, i){
+            var _y = '.loup-icon.y' + d.getFullYear();
+            svg.select(_y).attr('style', 'visibility:hidden;');
+          });
         
         svg.selectAll(".x.axis .tick text")
           .on('click', function(date, index){
@@ -819,7 +848,10 @@
         rmTable     = root.querySelector('.rm'),
         switcherElm = root.querySelector('.js');
   
-    var init = new Switchery(switcherElm, {color: '#9a9a9a', secondaryColor: '#9a9a9a'});
+    var init = new Switchery(
+      switcherElm, 
+      {color: '#9a9a9a', secondaryColor: '#9a9a9a'}
+     );
     /* GRAPH INITS */
     
     var apChart = 

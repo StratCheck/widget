@@ -352,3 +352,13 @@
   font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
   font-size: 14px;
 }
+
+.strat-check-a04g5ewen4tggb9 .loup-icon {
+  visibility: hidden;
+}
+
+.strat-check-a04g5ewen4tggb9 .loup-icon line{
+  fill: #00b4e5;
+  stroke-width: 2px;
+  stroke: #00b4e5 !important;
+}
