@@ -186,12 +186,12 @@
           .attr("transform", "translate(0," + yScale.range()[0] + ")")
           .call(xAxis);
         
-        svg.selectAll(".x.axis text")
+        svg.selectAll(".x.axis > g > text")
           .transition()
           .duration(1500)
           .attr("y", 10)
           .attr('class', function(d){
-            return 'y'+d.getFullYear();
+            return 'tick-year y'+d.getFullYear();
           });
 
         gEnter.select('.x.axis')
