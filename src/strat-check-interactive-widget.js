@@ -105,7 +105,6 @@
           .sortBy(function(o){ return o.x; })
           .value();
         });
-      var ts = _.chain(results['Moderate Aggressive']).map(function(e){ return e.x; });
       return results;
     }
     
@@ -427,6 +426,15 @@
         verticalMap = [
           'Client Strategy', 
           'Moderate Aggressive'],
+        heatMap = {
+          'annualized_return' : true,
+          'annualized_vol'    : false,
+          'sharpe_ratio'      : true,
+          'sortino_ratio'     : true,
+          'max_drawdown'      : false,
+        },
+        RED_CLS   = 'red-cell',
+        GREEN_CLS = 'green-cell',
         year;
      
      function mapData(inData) {
@@ -449,9 +457,24 @@
         var data = mapData(rawData),
             line1 = d3.select(this).selectAll(".l1 td").data(data[0]),
             line2 = d3.select(this).selectAll(".l2 td").data(data[1]);
-
-        line1.transition().text(function(d){ return d; });
-        line2.transition().text(function(d){ return d; });
+        
+        function setHeatMap(k){
+          return function(d, i){
+            if(heatMap[horizontalMap[i]]){
+              return d > data[k][i] ? GREEN_CLS : RED_CLS;
+            } else {
+              return d < data[k][i] ? GREEN_CLS : RED_CLS;
+            }
+          }
+        }
+        
+        line1.transition()
+          .attr('class', setHeatMap(1))
+          .text(function(d){ return d; });
+          
+        line2.transition()
+          .attr('class', setHeatMap(0))
+          .text(function(d){ return d; });
         
       });
      };
