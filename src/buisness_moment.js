@@ -56,7 +56,7 @@
     moment.fn.businessSubtract = function (days) {
         var i = 0;
         while (i < days) {
-            this.subtract('day', 1);
+            this.subtract(1, 'day');
             if (this.day() > 0 && this.day() < 6) {
                 i++;
             }

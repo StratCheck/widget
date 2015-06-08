@@ -43,7 +43,7 @@
 
     var margin     = {top: 0, right: 20, bottom: 20, left: 50},
         svgWidth   = 580,
-        svgHeight  = 340,
+        svgHeight  = 350,
         width      = svgWidth,
         height     = svgHeight,
         
@@ -82,7 +82,8 @@
             } 
           }),
         brushCallback,
-        chooseYearClb;
+        chooseYearClb,
+        crossIconCallback;
     
     function prepareData(newData){
       var intermediateRes, 
@@ -114,7 +115,7 @@
         var data = prepareData(newData);
 
         width  = svgWidth - margin.left - margin.right;
-        height = svgHeight - margin.bottom;
+        height = svgHeight - margin.bottom - 10;
         
         var xDomain = [undefined, undefined],
             yDomain = [undefined, undefined];
@@ -205,6 +206,34 @@
           .style('visibility', 'visible');
 
         gEnter.append('g').attr('class', 'paths');
+        
+        var gEnterCircle = gEnter
+            .selectAll(".x.axis .tick")
+            .append('g')
+            .attr('class', function(d, i){
+              return 'icon-cross y'+d.getFullYear();
+            })
+            .attr('style', 'visibility: hidden;')
+            .on('click', function(d, i){
+              if(utils.isFunction(crossIconCallback)){
+                crossIconCallback(d, i);
+              }
+            });
+            
+            gEnterCircle
+              .append('circle')
+              .attr('r', '8px')
+              .attr('cx', '-26px')
+              .attr('cy', '14px');
+            
+            gEnterCircle
+              .append('text')
+              .attr('x', '-29.5px')
+              .attr('y', '18px')
+              .text('x');
+              
+        
+        console.log(d3.selectAll('.icon-cross'));
         
         var enterLines = svg
           .select('.paths')
@@ -354,6 +383,16 @@
       chooseYearClb = _;
       return chart;
     };
+    
+    chart.setCrossIconCallback = function(_) {
+      if (!arguments.length) return crossIconCallback;
+      if (!utils.isFunction(_)) {
+        throw Exception('The cross icon callback must be a function!');
+      }
+      crossIconCallback = _;
+      return chart;
+    };
+    
     
     chart.chartType = function(_) {
       if (!arguments.length) return chart_type;
@@ -688,7 +727,7 @@
                    pos = outerArc.centroid(d2);
                 pos[0] = radius * 0.95 * (midAngle(d2) < Math.PI ? 1 : -1);
                 var innerPos = _.map(arc.centroid(d2), function(a){
-                  return a*1.9;
+                  return a*1.75;
                 });
                 return [innerPos, outerArc.centroid(d2), pos];
               };
@@ -833,20 +872,32 @@
         .call(rmTableD);
     };
     
+    
+    function __ResetAndRenderGraphs() {
+      updateYear(root);
+      drawCircleChart(__WidgetData[ATTRS]);
+      drawAbsoluteTable(__WidgetData[ABSOLUTE_METRICS]);
+      drawRelativeTable(__WidgetData[RELATIVE_METRICS]);
+      root.querySelector('.x.brush').style.opacity = '0';
+    }
+    
     var chart = 
       timeSeriesChart()
         .x(function(o){ return o.x; })
         .y(function(o){ return o.y; })
         .chartType(chartTypes[0])
         .chooseYear(function(dt, index){
-          var y = dt.getFullYear(),
-              texts = root.querySelectorAll('.x.axis .tick text');
-              
+          var y     = dt.getFullYear(),
+              texts = root.querySelectorAll('.x.axis .tick text'),
+              cross = root.querySelectorAll('.x.axis .tick .icon-cross');
+           
+           
           _.chain(texts)
             .each(function(elm, i){
               elm.style.fill = '#64b1e0';
             })
             .value();
+           d3.selectAll(cross).attr('style', 'visibility: hidden;');
               
           if (y < 2015) {
             updateYear(root, y);
@@ -863,6 +914,23 @@
               .each(function(elm, i){
                 elm.style.fill = '#999999';
               })
+              .value(),
+            _.chain(cross)
+              .filter(function(elm, i){
+                var cY = 
+                  _.chain(elm.classList)
+                    .tail()
+                    .map(function(d){
+                      return Number(d.replace('y', ''));
+                    })
+                    .head()
+                    .value();
+                    
+                return cY === y;
+              })
+              .each(function(elm, i){
+                elm.style.visibility = 'visible';
+              })
               .value();
             
           } else {
@@ -873,6 +941,19 @@
             
             root.querySelector('.x.brush').style.opacity = '0';
           }
+        })
+        .setCrossIconCallback(function(dt, index){
+          var texts = root.querySelectorAll('.x.axis .tick text'),
+              cross = root.querySelectorAll('.x.axis .tick .icon-cross');
+              
+          _.chain(texts)
+            .each(function(elm, i){
+              elm.style.fill = '#64b1e0';
+            })
+            .value();
+            
+          d3.selectAll(cross).attr('style', 'visibility: hidden;');
+          __ResetAndRenderGraphs();
         });
      
     var drawMainChart = function(newData) {
