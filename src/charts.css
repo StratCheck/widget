@@ -122,12 +122,17 @@
   text-transform: uppercase;
 }
 
+.strat-check-a04g5ewen4tggb9 .paths{
+  overflow: hidden;
+}
+
 .strat-check-a04g5ewen4tggb9 svg {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 14px;
   line-height: 1.428571429;
   background-color: #fff;
   color: #333;
+  overflow: hidden;
 }
 
 .strat-check-a04g5ewen4tggb9 .acw text{
@@ -185,8 +190,9 @@
   shape-rendering: crispEdges;
 }
 
-.strat-check-a04g5ewen4tggb9 .brush .resize {
-  fill: url("/images/arrowUp.jpg");
+.strat-check-a04g5ewen4tggb9 .brush .resize rect{
+  visibility: hidden !important;
+  opacity: 0;
 }
 
 .strat-check-a04g5ewen4tggb9 g.tick line,

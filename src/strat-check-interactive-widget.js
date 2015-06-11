@@ -2,7 +2,6 @@
 /* global __sc_cs */
 /* global Exception */
 /* global _ */
-//TODO: Remove and change to d3.time.format if it possible
 /* global moment */
 /* global d3 */
 (function() {
@@ -923,14 +922,13 @@
               texts = root.querySelectorAll('.x.axis .tick text'),
               cross = root.querySelectorAll('.x.axis .tick .icon-cross');
            
-           
           _.chain(texts)
             .each(function(elm, i){
               elm.style.fill = '#64b1e0';
             })
             .value();
            d3.selectAll(cross).attr('style', 'visibility: hidden;');
-              
+          
           if (y < 2015) {
             updateYear(root, y);
             drawCircleChart(__WidgetData[ATTRS], y);
@@ -950,7 +948,8 @@
             _.chain(cross)
               .filter(function(elm, i){
                 var cY = 
-                  _.chain(elm.classList)
+                  _.chain(d3.select(elm).attr('class').split(' '))
+                    .map(_.trim)
                     .tail()
                     .map(function(d){
                       return Number(d.replace('y', ''));
@@ -964,7 +963,7 @@
                 elm.style.visibility = 'visible';
               })
               .value();
-            
+          
           } else {
             updateYear(root);
             drawCircleChart(__WidgetData[ATTRS]);

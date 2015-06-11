@@ -10,6 +10,7 @@ module.exports = function(grunt) {
       build: {
         src : [
           'src/ShadowDOM.js', 
+          'src/class_list_shim.js',
           'bower_components/lodash/lodash.js',
           'bower_components/moment/moment.js',
           'bower_components/switchery/dist/switchery.js',
