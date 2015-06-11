@@ -43,7 +43,6 @@ module.exports = function(grunt) {
       'src'  : 'src/template.html',
       'dest' : 'src/tmpl.js'
     }
-
   });
 
   // Load the plugin that provides the "uglify" task.
@@ -52,7 +51,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-serve');
   
   grunt.loadNpmTasks('grunt-contrib-concat');
-  
   
   // Default task(s).
   grunt.task.registerTask(
