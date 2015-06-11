@@ -7,11 +7,13 @@
 (function() {
   "use strict";
   
-  var __WidgetStyles, __WidgetTmpl, __WidgetData;
+  var __WidgetData;
   
-  var widgetStyles = __sc_cs,
-      widgetTmpl   = __sc_tmpl,
+  var widgetStyles = _.clone(__sc_cs),
+      widgetTmpl   = _.clone(__sc_tmpl),
       chartTypes   = ['relative_price', 'growth_of_one_dollar'];
+  
+  delete __sc_cs; delete __sc_tmpl; 
   
   var ATTRS               = 'attrs',
       ABSOLUTE_METRICS    = 'abs_metrics',
